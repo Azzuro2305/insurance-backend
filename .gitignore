@@ -18,8 +18,10 @@ target/
 *.iws
 *.iml
 *.ipr
+*.yml
 
 ### NetBeans ###
+/src/main/resources/application.yml
 /nbproject/private/
 /nbbuild/
 /dist/
