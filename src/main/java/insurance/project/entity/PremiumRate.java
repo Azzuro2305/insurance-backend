@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,4 +29,12 @@ public class PremiumRate {
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
+
+    @OneToMany(mappedBy = "premiumRate")
+    private List<OutboundProposal> outboundProposal;
+
+    @ManyToOne
+    @JoinColumn(name = "Currency_id")
+    private Currency currency;
+
 }

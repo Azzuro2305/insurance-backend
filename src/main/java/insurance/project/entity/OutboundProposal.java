@@ -1,9 +1,6 @@
 package insurance.project.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -35,4 +32,18 @@ public class OutboundProposal {
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
+
+    @ManyToOne
+    @JoinColumn(name = "InsuredPerson_id")
+    private InsuredPerson insuredPerson;
+
+    @ManyToOne
+    @JoinColumn(name = "Agent_id")
+    private Agent agent;
+
+    @ManyToOne
+    @JoinColumn(name = "PremiumRate_id")
+    private PremiumRate premiumRate;
+
+
 }

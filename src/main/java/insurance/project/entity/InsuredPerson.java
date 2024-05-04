@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -41,18 +42,19 @@ public class InsuredPerson {
     private LocalDate updatedDate;
     private int version;
 
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
+//    @OneToOne
+//    @JoinColumn(name = "agent_id")
+//    private Agent agent;
+//
+//    @OneToOne
+//    @JoinColumn(name = "beneficiary_id")
+//    private Beneficiary beneficiary;
+//
+//    @OneToOne
+//    @JoinColumn(name = "child_id")
+//    private Child child;
+//
+    @OneToMany(mappedBy = "insuredPerson")
+    private List<OutboundProposal> outboundProposal;
 
-    @OneToOne
-    @JoinColumn(name = "agent_id")
-    private Agent agent;
-
-    @OneToOne
-    @JoinColumn(name = "beneficiary_id")
-    private Beneficiary beneficiary;
-
-    @OneToOne
-    @JoinColumn(name = "child_id")
-    private Child child;
 }
