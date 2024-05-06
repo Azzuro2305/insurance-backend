@@ -24,13 +24,11 @@ public class Agent {
     private LocalDate agentDOB;
     private String agentPassword;
     private String agentType;
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
 
-    @OneToMany(mappedBy = "agent")
-    private List<OutboundProposal> outboundProposal;
+    @OneToMany(mappedBy = "agent", cascade = CascadeType.ALL)
+    private List<OutboundProposal> outboundProposals;
 
 }

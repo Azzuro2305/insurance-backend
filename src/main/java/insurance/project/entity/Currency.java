@@ -21,14 +21,11 @@ public class Currency {
     private String currencyName;
     private String description;
 
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
-
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
 
-    @OneToMany(mappedBy = "currency")
-    private List<PremiumRate> premiumRate;
+    @OneToMany(mappedBy = "currency", cascade = CascadeType.ALL)
+    private List<PremiumRate> premiumRates;
 
 }

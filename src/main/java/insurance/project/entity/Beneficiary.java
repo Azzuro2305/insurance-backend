@@ -1,9 +1,6 @@
 package insurance.project.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -28,11 +25,14 @@ public class Beneficiary {
     private String beneficiaryNRC;
     private String beneficiaryEmail;
     private String beneficiaryAddress;
-
-//    private UUID countryID;
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
+
+    @OneToOne(mappedBy = "beneficiary", fetch = FetchType.LAZY)
+    private InsuredPerson insuredPerson;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 }

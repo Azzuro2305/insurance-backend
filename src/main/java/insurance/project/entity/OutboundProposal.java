@@ -20,30 +20,24 @@ public class OutboundProposal {
     private LocalDate policyStartDate;
     private LocalDate policyEndDate;
     private LocalDate estimateDepartureDate;
-    private String journeyFrom;
+    private String journeyFrom;  // default value will be given from frontend side (MYANMAR)
     private String journeyTo;
     private double rate;
     private int coveragePlan;
     private String packages;
-//    private UUID insuredPersonID;
-//    private UUID agentID;
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
 
     @ManyToOne
-    @JoinColumn(name = "InsuredPerson_id")
+    @JoinColumn(name = "insured_person_id")
     private InsuredPerson insuredPerson;
 
-    @ManyToOne
-    @JoinColumn(name = "Agent_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agent_id")
     private Agent agent;
 
-    @ManyToOne
-    @JoinColumn(name = "PremiumRate_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "premium_rate_id")
     private PremiumRate premiumRate;
-
-
 }

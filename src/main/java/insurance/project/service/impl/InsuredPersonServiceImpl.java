@@ -1,24 +1,137 @@
 package insurance.project.service.impl;
 
-import insurance.project.repo.AgentRepo;
-import insurance.project.repo.BeneficiaryRepo;
-import insurance.project.repo.ChildRepo;
-import insurance.project.repo.InsuredPersonRepo;
+import insurance.project.dto.NewInsurance.NewInsurance;
+import insurance.project.entity.*;
+import insurance.project.repo.*;
 import insurance.project.service.InsuredPersonService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class InsuredPersonServiceImpl implements InsuredPersonService {
 
     private final InsuredPersonRepo insuredRepo;
+    private final OutboundProposalRepo outboundProposalRepo;
     private final BeneficiaryRepo beneficiaryRepo;
     private final ChildRepo childRepo;
     private final AgentRepo agentRepo;
+    private final PremiumRateRepo premiumRateRepo;
+    private final CountryRepo countryRepo;
 
     private final ModelMapper modelMapper;
+
+    @Transactional
+    @Override
+    public NewInsurance registerInsurance(NewInsurance newInsurance) {
+        Optional<InsuredPerson> optionalInsuredPerson = insuredRepo.findByPassportNumber(newInsurance.getPassportNumber());
+
+        if (optionalInsuredPerson.isPresent()) {
+            InsuredPerson insuredPerson = optionalInsuredPerson.get();
+            createAndSaveChild(newInsurance, insuredPerson);
+            createAndSaveBeneficiary(newInsurance, insuredPerson);
+            createAndSaveOutboundProposal(newInsurance, insuredPerson);
+            insuredRepo.save(insuredPerson);
+            return modelMapper.map(newInsurance, NewInsurance.class);
+        } else {
+            InsuredPerson newInsuredPerson = modelMapper.map(newInsurance, InsuredPerson.class);
+            newInsuredPerson.setCreatedDate(LocalDate.now());
+            newInsuredPerson.setUpdatedDate(LocalDate.now());
+            newInsuredPerson.setCountry(countryRepo.findByCountryID(newInsurance.getPassportIssuedCountry()));
+            newInsuredPerson.setVersion(1);
+            createAndSaveChild(newInsurance, newInsuredPerson);
+            createAndSaveBeneficiary(newInsurance, newInsuredPerson);
+            createAndSaveOutboundProposal(newInsurance, newInsuredPerson);
+            insuredRepo.save(newInsuredPerson);
+            return modelMapper.map(newInsurance, NewInsurance.class);
+        }
+    }
+
+    private void createAndSaveChild(NewInsurance newInsurance, InsuredPerson insuredPerson) {
+        if (newInsurance.isHasChild()) {
+            Child newChild = modelMapper.map(newInsurance, Child.class);
+            newChild.setCreatedDate(LocalDate.now());
+            newChild.setUpdatedDate(LocalDate.now());
+            newChild.setInsuredPerson(insuredPerson);
+            newChild.setVersion(1);
+            insuredRepo.save(insuredPerson);
+            childRepo.save(newChild);
+            if (insuredPerson.getChildren() == null) {
+                insuredPerson.setChildren(new ArrayList<>());
+            }
+            insuredPerson.getChildren().add(newChild);
+        }
+    }
+
+    private void createAndSaveBeneficiary(NewInsurance newInsurance, InsuredPerson insuredPerson) {
+        Beneficiary newBeneficiary = modelMapper.map(newInsurance, Beneficiary.class);
+        newBeneficiary.setCreatedDate(LocalDate.now());
+        newBeneficiary.setUpdatedDate(LocalDate.now());
+        newBeneficiary.setInsuredPerson(insuredPerson);
+        newBeneficiary.setCountry(countryRepo.findByCountryID(newInsurance.getBeneficiaryPhoneCode()));
+        newBeneficiary.setVersion(1);
+        beneficiaryRepo.save(newBeneficiary);
+        insuredPerson.setBeneficiary(newBeneficiary);
+    }
+
+    private void createAndSaveOutboundProposal(NewInsurance newInsurance, InsuredPerson insuredPerson) {
+        OutboundProposal newOutboundProposal = modelMapper.map(newInsurance, OutboundProposal.class);
+        newOutboundProposal.setSubmittedDate(LocalDate.now());
+        newOutboundProposal.setCreatedDate(LocalDate.now());
+        newOutboundProposal.setUpdatedDate(LocalDate.now());
+        newOutboundProposal.setInsuredPerson(insuredPerson);
+        newOutboundProposal.setPolicyEndDate(newInsurance.getPolicyStartDate().plusDays(newInsurance.getCoveragePlan()));
+        newOutboundProposal.setSubmittedDate(LocalDate.now());
+        newOutboundProposal.setVersion(1);
+
+        int insuredPersonAge = LocalDate.now().getYear() - insuredPerson.getInsuredDOB().getYear();
+        int[] ageRange = getAgeRange(insuredPersonAge);
+        newOutboundProposal.setPremiumRate(premiumRateRepo.findPremiumRateByPackageAndCoveragePlanAndAgeRange(newInsurance.getPackages(), newInsurance.getCoveragePlan(), ageRange[0], ageRange[1])
+                .orElseThrow(() -> new RuntimeException("Premium rate not found")));
+        newOutboundProposal.setRate(newOutboundProposal.getPremiumRate().getRate());
+
+        if (newInsurance.isHasAgent()) {
+            Optional<Agent> optionalAgent = agentRepo.findAgentByAgentLicense(newInsurance.getAgentLicenseNumber());
+            if (optionalAgent.isPresent()) {
+                Agent agent = optionalAgent.get();
+                agentRepo.save(agent);
+                newOutboundProposal.setAgent(agent);
+            } else {
+                throw new RuntimeException("Agent not found");
+
+            }
+        } else {
+            newOutboundProposal.setAgent(null);
+        }
+        outboundProposalRepo.save(newOutboundProposal);
+    }
+
+
+    public int[] getAgeRange(int insuredPersonAge) {
+        int fromAge = insuredPersonAge >= 1 && insuredPersonAge <= 50 ? 1 :
+                insuredPersonAge >= 51 && insuredPersonAge <= 60 ? 51 :
+                        insuredPersonAge >= 61 && insuredPersonAge <= 75 ? 61 :
+                                insuredPersonAge >= 75 ? insuredPersonAge : -1;
+
+        int toAge = insuredPersonAge >= 1 && insuredPersonAge <= 50 ? 50 :
+                insuredPersonAge >= 51 && insuredPersonAge <= 60 ? 60 :
+                        insuredPersonAge >= 61 && insuredPersonAge <= 75 ? 75 :
+                                insuredPersonAge > 75 ? insuredPersonAge : -1;
+
+        if (fromAge == -1) {
+            throw new IllegalArgumentException("Invalid age: " + insuredPersonAge);
+        }
+
+        return new int[]{fromAge, toAge};
+    }
+
+
 
 //    @Transactional
 //    @Override

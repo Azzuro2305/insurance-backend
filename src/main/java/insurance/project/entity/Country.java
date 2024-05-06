@@ -1,12 +1,10 @@
 package insurance.project.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -24,7 +22,11 @@ public class Country {
     private String shortCountryName;
     private LocalDate createdDate;
     private LocalDate updatedDate;
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
     private int version;
+
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
+    private List<InsuredPerson> insuredPersons;
+
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
+    private List<Beneficiary> beneficiaries;
 }

@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface AgentRepo extends JpaRepository<Agent, UUID> {
-//    Optional<Agent> findAgentByLicenseNumber(String licenseNumber);
+    Optional<Agent> findAgentByAgentLicense(String agentLicense);
 }

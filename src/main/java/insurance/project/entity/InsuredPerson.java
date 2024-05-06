@@ -35,26 +35,21 @@ public class InsuredPerson {
     private String passportNumber;
     private String isChild;
 
-//    private UUID beneficiaryID;
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
 
-//    @OneToOne
-//    @JoinColumn(name = "agent_id")
-//    private Agent agent;
-//
-//    @OneToOne
-//    @JoinColumn(name = "beneficiary_id")
-//    private Beneficiary beneficiary;
-//
-//    @OneToOne
-//    @JoinColumn(name = "child_id")
-//    private Child child;
-//
-    @OneToMany(mappedBy = "insuredPerson")
-    private List<OutboundProposal> outboundProposal;
+    @OneToMany(mappedBy = "insuredPerson", cascade = CascadeType.ALL)
+    private List<OutboundProposal> outboundProposals;
 
+    @OneToMany(mappedBy = "insuredPerson", cascade = CascadeType.ALL)
+    private List<Child> children;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "beneficiary_id", referencedColumnName = "beneficiaryID")
+    private Beneficiary beneficiary;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 }

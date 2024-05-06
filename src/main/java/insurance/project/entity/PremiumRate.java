@@ -23,18 +23,14 @@ public class PremiumRate {
     private double rate;
     private String countryName;
     private String packages;
-//    private UUID currencyID;
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
 
-    @OneToMany(mappedBy = "premiumRate")
-    private List<OutboundProposal> outboundProposal;
+    @OneToMany(mappedBy = "premiumRate", cascade = CascadeType.ALL)
+    private List<OutboundProposal> outboundProposals;
 
-    @ManyToOne
-    @JoinColumn(name = "Currency_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "currency_id")
     private Currency currency;
-
 }

@@ -1,9 +1,6 @@
 package insurance.project.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -27,11 +24,11 @@ public class Child {
     private String guardianceName;
     private String childRelationship;
 
-//    private UUID insuredPersonID;
-//    private UUID createdUserID;
-//    private UUID updatedUserID;
-
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "insured_person_id")
+    private InsuredPerson insuredPerson;
 }
