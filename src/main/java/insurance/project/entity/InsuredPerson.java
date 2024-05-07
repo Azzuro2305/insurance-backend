@@ -50,6 +50,6 @@ public class InsuredPerson {
     private Beneficiary beneficiary;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "passport_issued_country_id")
     private Country country;
 }

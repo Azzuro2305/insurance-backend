@@ -22,6 +22,7 @@ public class OutboundProposal {
     private LocalDate estimateDepartureDate;
     private String journeyFrom;  // default value will be given from frontend side (MYANMAR)
     private String journeyTo;
+    private String destinationCountry;
     private double rate;
     private int coveragePlan;
     private String packages;

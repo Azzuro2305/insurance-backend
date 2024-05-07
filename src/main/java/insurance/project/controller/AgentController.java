@@ -1,13 +1,36 @@
 package insurance.project.controller;
 
+import insurance.project.dto.AgentValidation.AgentValidation;
+import insurance.project.dto.utility.HttpResponse;
+import insurance.project.service.AgentService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
 @AllArgsConstructor
 @RequestMapping("/agent")
 public class AgentController {
+    private final AgentService agentService;
+
+//    @GetMapping("/validate")
+//    public ResponseEntity<HttpResponse<AgentValidation>> validateAgent(AgentValidation agentValidation) {
+//        AgentValidation agent = agentService.validateAgent(agentValidation);
+//        HttpResponse<AgentValidation> response = new HttpResponse<>(agent, "Successfully validated", HttpStatus.OK);
+//        return ResponseEntity.ok(response);
+//    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<HttpResponse<AgentValidation>> validateAgent(@RequestBody AgentValidation agentValidation) {
+        AgentValidation agent = agentService.validateAgent(agentValidation);
+        if (agent.isValid()) {
+            return ResponseEntity.ok(new HttpResponse<>(agent, "Successfully validated", HttpStatus.OK));
+        } else {
+            return ResponseEntity.ok(new HttpResponse<>(agent, "Validation failed", HttpStatus.BAD_REQUEST));
+        }
+//        HttpResponse<AgentValidation> response = new HttpResponse<>(agent, "Successfully validated", HttpStatus.OK);
+//        return ResponseEntity.ok(response);
+    }
 }
