@@ -17,15 +17,11 @@ public class Currency {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID currencyID;
+    private UUID id;
     private String currencyName;
     private String description;
 
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
-
-    @OneToMany(mappedBy = "currency", cascade = CascadeType.ALL)
-    private List<PremiumRate> premiumRates;
-
 }

@@ -43,7 +43,7 @@ public class NewInsurance {
     private String beneficiaryName;
     private LocalDate beneficiaryDOB;
     private String beneficiaryRelationship;
-    private UUID beneficiaryPhoneCode;  // check
+    private String beneficiaryPhoneCode;  // check
     private String beneficiaryPhoneNumber;
     private String beneficiaryNRC;
     private String beneficiaryEmail;

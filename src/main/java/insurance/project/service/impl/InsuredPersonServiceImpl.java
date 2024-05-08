@@ -27,31 +27,37 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
 
     private final ModelMapper modelMapper;
 
+
+
     @Transactional
     @Override
     public NewInsurance registerInsurance(NewInsurance newInsurance) {
         Optional<InsuredPerson> optionalInsuredPerson = insuredRepo.findByPassportNumber(newInsurance.getPassportNumber());
 
-        if (optionalInsuredPerson.isPresent()) {
-            InsuredPerson insuredPerson = optionalInsuredPerson.get();
-            createAndSaveChild(newInsurance, insuredPerson);
-            createAndSaveBeneficiary(newInsurance, insuredPerson);
-            createAndSaveOutboundProposal(newInsurance, insuredPerson);
-            insuredRepo.save(insuredPerson);
-            return modelMapper.map(newInsurance, NewInsurance.class);
-        } else {
+//        if (optionalInsuredPerson.isPresent()) {
+//            InsuredPerson insuredPerson = optionalInsuredPerson.get();
+//            OutboundProposal newOutboundProposal = createAndSaveOutboundProposal(newInsurance, insuredPerson);
+//            insuredPerson.setOutboundProposal(newOutboundProposal);
+//            createAndSaveChild(newInsurance, insuredPerson);
+//            createAndSaveBeneficiary(newInsurance, insuredPerson);
+//            insuredRepo.save(insuredPerson);
+//            return modelMapper.map(newInsurance, NewInsurance.class);
+//        } else {
             InsuredPerson newInsuredPerson = modelMapper.map(newInsurance, InsuredPerson.class);
             newInsuredPerson.setCreatedDate(LocalDate.now());
             newInsuredPerson.setUpdatedDate(LocalDate.now());
-            newInsuredPerson.setCountry(countryRepo.findByCountryID(newInsurance.getPassportIssuedCountry()));
+            newInsuredPerson.setCountry(countryRepo.findById(newInsurance.getPassportIssuedCountry()).orElseThrow(() -> new RuntimeException("Country not found")));
             newInsuredPerson.setVersion(1);
+            OutboundProposal newOutboundProposal = createAndSaveOutboundProposal(newInsurance, newInsuredPerson);
+            newInsuredPerson.setOutboundProposal(newOutboundProposal);
             createAndSaveChild(newInsurance, newInsuredPerson);
             createAndSaveBeneficiary(newInsurance, newInsuredPerson);
-            createAndSaveOutboundProposal(newInsurance, newInsuredPerson);
+
             insuredRepo.save(newInsuredPerson);
             return modelMapper.map(newInsurance, NewInsurance.class);
-        }
+//        }
     }
+
 
     private void createAndSaveChild(NewInsurance newInsurance, InsuredPerson insuredPerson) {
         if (newInsurance.isHasChild()) {
@@ -62,30 +68,34 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
             newChild.setVersion(1);
             insuredRepo.save(insuredPerson);
             childRepo.save(newChild);
-            if (insuredPerson.getChildren() == null) {
-                insuredPerson.setChildren(new ArrayList<>());
-            }
-            insuredPerson.getChildren().add(newChild);
+//            if (insuredPerson.getChildren() == null) {
+//                insuredPerson.setChildren(new ArrayList<>());
+//            }
+//            insuredPerson.getChildren().add(newChild);
         }
     }
+
 
     private void createAndSaveBeneficiary(NewInsurance newInsurance, InsuredPerson insuredPerson) {
         Beneficiary newBeneficiary = modelMapper.map(newInsurance, Beneficiary.class);
         newBeneficiary.setCreatedDate(LocalDate.now());
         newBeneficiary.setUpdatedDate(LocalDate.now());
         newBeneficiary.setInsuredPerson(insuredPerson);
-        newBeneficiary.setCountry(countryRepo.findByCountryID(newInsurance.getBeneficiaryPhoneCode()));
+//        newBeneficiary.setCountry(countryRepo.findByCountryID(newInsurance.getBeneficiaryPhoneCode()));
+        newBeneficiary.setCountry(countryRepo.findByCountryCode(newInsurance.getBeneficiaryPhoneCode()));
         newBeneficiary.setVersion(1);
+        newBeneficiary.setInsuredPerson(insuredPerson);
         beneficiaryRepo.save(newBeneficiary);
-        insuredPerson.setBeneficiary(newBeneficiary);
+//        insuredPerson.setBeneficiary(newBeneficiary);
     }
 
-    private void createAndSaveOutboundProposal(NewInsurance newInsurance, InsuredPerson insuredPerson) {
+
+    private OutboundProposal createAndSaveOutboundProposal(NewInsurance newInsurance, InsuredPerson insuredPerson) {
         OutboundProposal newOutboundProposal = modelMapper.map(newInsurance, OutboundProposal.class);
         newOutboundProposal.setSubmittedDate(LocalDate.now());
         newOutboundProposal.setCreatedDate(LocalDate.now());
         newOutboundProposal.setUpdatedDate(LocalDate.now());
-        newOutboundProposal.setInsuredPerson(insuredPerson);
+//        newOutboundProposal.setInsuredPerson(insuredPerson);
         newOutboundProposal.setPolicyEndDate(newInsurance.getPolicyStartDate().plusDays(newInsurance.getCoveragePlan()));
         newOutboundProposal.setSubmittedDate(LocalDate.now());
         newOutboundProposal.setVersion(1);
@@ -109,7 +119,7 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
         } else {
             newOutboundProposal.setAgent(null);
         }
-        outboundProposalRepo.save(newOutboundProposal);
+        return outboundProposalRepo.save(newOutboundProposal);
     }
 
 
@@ -130,6 +140,13 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
 
         return new int[]{fromAge, toAge};
     }
+
+
+
+
+
+
+
 
 
 

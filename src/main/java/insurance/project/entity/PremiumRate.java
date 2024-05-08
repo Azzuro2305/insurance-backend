@@ -16,7 +16,7 @@ import java.util.UUID;
 public class PremiumRate {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID premiumRateID;
+    private UUID id;
     private int coveragePlan;
     private int fromAge;
     private int toAge;
@@ -26,9 +26,6 @@ public class PremiumRate {
     private LocalDate createdDate;
     private LocalDate updatedDate;
     private int version;
-
-    @OneToMany(mappedBy = "premiumRate", cascade = CascadeType.ALL)
-    private List<OutboundProposal> outboundProposals;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currency_id")

@@ -17,7 +17,7 @@ import java.util.UUID;
 public class InsuredPerson {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID insuredPersonID;
+    private UUID id;
 
     private String insuredName;
     private LocalDate insuredDOB;
@@ -39,17 +39,34 @@ public class InsuredPerson {
     private LocalDate updatedDate;
     private int version;
 
-    @OneToMany(mappedBy = "insuredPerson", cascade = CascadeType.ALL)
-    private List<OutboundProposal> outboundProposals;
+//    @OneToMany(mappedBy = "insuredPerson", cascade = CascadeType.ALL)
+//    private List<OutboundProposal> outboundProposals;
+//
+//    @OneToMany(mappedBy = "insuredPerson", cascade = CascadeType.ALL)
+//    private List<Child> children;
 
-    @OneToMany(mappedBy = "insuredPerson", cascade = CascadeType.ALL)
-    private List<Child> children;
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "beneficiary_id", referencedColumnName = "beneficiaryID")
+//    private Beneficiary beneficiary;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "beneficiary_id", referencedColumnName = "beneficiaryID")
-    private Beneficiary beneficiary;
+//    @OneToMany(mappedBy = "insuredPerson", cascade = CascadeType.ALL)
+//    private List<Beneficiary> beneficiaries;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "passport_issued_country_id")
+//    private Country country;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "passport_issued_country_id")
+    @JoinColumn(name = "country_id")
     private Country country;
+
+//    @OneToMany(mappedBy = "insuredPerson", cascade = CascadeType.ALL)
+//    @JoinColumn(name = "outbound_proposal_id")
+//    private List<OutboundProposal> outboundProposals;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "outbound_proposal_id")
+    private OutboundProposal outboundProposal;
+
 }

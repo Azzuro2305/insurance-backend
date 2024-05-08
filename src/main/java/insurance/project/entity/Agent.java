@@ -17,7 +17,7 @@ import java.util.UUID;
 public class Agent {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID agentID;
+    private UUID id;
 
     private String agentName;
     private String agentLicense;

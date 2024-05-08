@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Child {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID childID;
+    private UUID id;
 
     private String childName;
     private LocalDate childDOB;
@@ -26,9 +26,9 @@ public class Child {
 
     private LocalDate createdDate;
     private LocalDate updatedDate;
-    private int version;
+    private int version;;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "insured_person_id")
-    private InsuredPerson insuredPerson;
+    private InsuredPerson insuredPerson;;
 }

@@ -15,7 +15,7 @@ import java.util.UUID;
 public class OutboundProposal {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID outboundProposalID;
+    private UUID id;
     private LocalDate submittedDate;
     private LocalDate policyStartDate;
     private LocalDate policyEndDate;
@@ -30,9 +30,23 @@ public class OutboundProposal {
     private LocalDate updatedDate;
     private int version;
 
-    @ManyToOne
-    @JoinColumn(name = "insured_person_id")
-    private InsuredPerson insuredPerson;
+//    @ManyToOne
+//    @JoinColumn(name = "insured_person_id")
+//    private InsuredPerson insuredPerson;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "agent_id")
+//    private Agent agent;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "premium_rate_id")
+//    private PremiumRate premiumRate;
+//
+//    @OneToOne(mappedBy = "outboundProposal", fetch = FetchType.LAZY)
+//    private Child child;
+//
+//    @OneToOne(mappedBy = "outboundProposal", fetch = FetchType.LAZY)
+//    private Beneficiary beneficiary;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agent_id")
@@ -41,4 +55,8 @@ public class OutboundProposal {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "premium_rate_id")
     private PremiumRate premiumRate;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "insured_person_id")
+//    private InsuredPerson insuredPerson;
 }

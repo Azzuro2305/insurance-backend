@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Beneficiary {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID beneficiaryID;
+    private UUID id;
 
     private String beneficiaryName;
     private LocalDate beneficiaryDOB;
@@ -29,10 +29,11 @@ public class Beneficiary {
     private LocalDate updatedDate;
     private int version;
 
-    @OneToOne(mappedBy = "beneficiary", fetch = FetchType.LAZY)
-    private InsuredPerson insuredPerson;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     private Country country;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "insured_person_id")
+    private InsuredPerson insuredPerson;
 }
