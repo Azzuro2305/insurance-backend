@@ -29,11 +29,11 @@ public class Beneficiary {
     private LocalDate updatedDate;
     private int version;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "insured_person_id")
     private InsuredPerson insuredPerson;
 }

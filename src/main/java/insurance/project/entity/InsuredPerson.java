@@ -57,7 +57,7 @@ public class InsuredPerson {
 //    private Country country;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
 
@@ -65,7 +65,7 @@ public class InsuredPerson {
 //    @JoinColumn(name = "outbound_proposal_id")
 //    private List<OutboundProposal> outboundProposals;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "outbound_proposal_id")
     private OutboundProposal outboundProposal;
 

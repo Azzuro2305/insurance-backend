@@ -48,11 +48,11 @@ public class OutboundProposal {
 //    @OneToOne(mappedBy = "outboundProposal", fetch = FetchType.LAZY)
 //    private Beneficiary beneficiary;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "agent_id")
     private Agent agent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "premium_rate_id")
     private PremiumRate premiumRate;
 

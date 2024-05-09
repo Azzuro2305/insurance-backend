@@ -15,13 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class AgentController {
     private final AgentService agentService;
 
-//    @GetMapping("/validate")
-//    public ResponseEntity<HttpResponse<AgentValidation>> validateAgent(AgentValidation agentValidation) {
-//        AgentValidation agent = agentService.validateAgent(agentValidation);
-//        HttpResponse<AgentValidation> response = new HttpResponse<>(agent, "Successfully validated", HttpStatus.OK);
-//        return ResponseEntity.ok(response);
-//    }
-
     @GetMapping("/validate")
     public ResponseEntity<HttpResponse<AgentValidation>> validateAgent(@RequestBody AgentValidation agentValidation) {
         AgentValidation agent = agentService.validateAgent(agentValidation);
@@ -30,7 +23,5 @@ public class AgentController {
         } else {
             return ResponseEntity.ok(new HttpResponse<>(agent, "Validation failed", HttpStatus.BAD_REQUEST));
         }
-//        HttpResponse<AgentValidation> response = new HttpResponse<>(agent, "Successfully validated", HttpStatus.OK);
-//        return ResponseEntity.ok(response);
     }
 }

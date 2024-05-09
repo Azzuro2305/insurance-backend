@@ -14,6 +14,4 @@ public interface CountryRepo extends JpaRepository<Country, UUID> {
     Optional<Country> findById(UUID id);
     Country findByCountryCode(String countryCode);
     ArrayList<Country> findAll();
-
-//    Page<Country> findAll(Pageable pageable);
 }

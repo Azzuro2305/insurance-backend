@@ -1,17 +1,23 @@
 package insurance.project.service.impl;
 
+import insurance.project.dto.InsuredData.InsuredData;
 import insurance.project.dto.NewInsurance.NewInsurance;
 import insurance.project.entity.*;
 import insurance.project.repo.*;
 import insurance.project.service.InsuredPersonService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.modelmapper.AbstractConverter;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -28,21 +34,58 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
     private final ModelMapper modelMapper;
 
 
+    @Override
+    public List<InsuredData> getInsuredData(String passportNumber, UUID passportIssuedCountry) {
+        List<InsuredPerson> insuredPersons = insuredRepo.findByPassportNumberAndCountryId(passportNumber, passportIssuedCountry);
+        if (insuredPersons != null && !insuredPersons.isEmpty()) {
+            List<InsuredData> insuredDataList = new ArrayList<>();
+            for (InsuredPerson insuredPerson : insuredPersons) {
+                InsuredData insuredData = modelMapper.map(insuredPerson, InsuredData.class);
+                insuredData.setInsuredDOB(insuredPerson.getInsuredDOB());
+                insuredData.setInsuredPhoneNumber(insuredPerson.getInsuredPhoneNumber());
+                insuredData.setPassportNumber(insuredPerson.getPassportNumber());
+
+
+                insuredData.setInsuredAge(String.valueOf(LocalDate.now().getYear() - insuredPerson.getInsuredDOB().getYear()));
+                insuredData.setPassportIssuedCountry(insuredPerson.getCountry().getCountryName());
+
+                OutboundProposal outboundProposal = insuredPerson.getOutboundProposal();
+                insuredData.setPaymentDate(outboundProposal.getCreatedDate());
+                modelMapper.map(outboundProposal, insuredData);
+
+                PremiumRate premiumRate = outboundProposal.getPremiumRate();
+                modelMapper.map(premiumRate, insuredData);
+
+                Agent agent = outboundProposal.getAgent();
+                if (agent != null) {
+                    modelMapper.map(agent, insuredData);
+                    insuredData.setHasAgent(true);
+                } else {
+                    insuredData.setHasAgent(false);
+                }
+
+                Child child = childRepo.findByInsuredPersonId(insuredPerson.getId());
+                if (child != null) {
+                    insuredData.setChildDOB(child.getChildDOB());
+                    insuredData.setChildName(child.getChildName());
+                    insuredData.setChildAge(String.valueOf(LocalDate.now().getYear() - child.getChildDOB().getYear()));
+                    insuredData.setHasChild(true);
+                } else {
+                    insuredData.setHasChild(false);
+                }
+
+                insuredDataList.add(insuredData);
+            }
+            return insuredDataList;
+
+        }
+        return null;
+    }
+
 
     @Transactional
     @Override
     public NewInsurance registerInsurance(NewInsurance newInsurance) {
-        Optional<InsuredPerson> optionalInsuredPerson = insuredRepo.findByPassportNumber(newInsurance.getPassportNumber());
-
-//        if (optionalInsuredPerson.isPresent()) {
-//            InsuredPerson insuredPerson = optionalInsuredPerson.get();
-//            OutboundProposal newOutboundProposal = createAndSaveOutboundProposal(newInsurance, insuredPerson);
-//            insuredPerson.setOutboundProposal(newOutboundProposal);
-//            createAndSaveChild(newInsurance, insuredPerson);
-//            createAndSaveBeneficiary(newInsurance, insuredPerson);
-//            insuredRepo.save(insuredPerson);
-//            return modelMapper.map(newInsurance, NewInsurance.class);
-//        } else {
             InsuredPerson newInsuredPerson = modelMapper.map(newInsurance, InsuredPerson.class);
             newInsuredPerson.setCreatedDate(LocalDate.now());
             newInsuredPerson.setUpdatedDate(LocalDate.now());
@@ -55,8 +98,9 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
 
             insuredRepo.save(newInsuredPerson);
             return modelMapper.map(newInsurance, NewInsurance.class);
-//        }
     }
+
+
 
 
     private void createAndSaveChild(NewInsurance newInsurance, InsuredPerson insuredPerson) {
@@ -68,10 +112,6 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
             newChild.setVersion(1);
             insuredRepo.save(insuredPerson);
             childRepo.save(newChild);
-//            if (insuredPerson.getChildren() == null) {
-//                insuredPerson.setChildren(new ArrayList<>());
-//            }
-//            insuredPerson.getChildren().add(newChild);
         }
     }
 
@@ -81,12 +121,10 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
         newBeneficiary.setCreatedDate(LocalDate.now());
         newBeneficiary.setUpdatedDate(LocalDate.now());
         newBeneficiary.setInsuredPerson(insuredPerson);
-//        newBeneficiary.setCountry(countryRepo.findByCountryID(newInsurance.getBeneficiaryPhoneCode()));
         newBeneficiary.setCountry(countryRepo.findByCountryCode(newInsurance.getBeneficiaryPhoneCode()));
         newBeneficiary.setVersion(1);
         newBeneficiary.setInsuredPerson(insuredPerson);
         beneficiaryRepo.save(newBeneficiary);
-//        insuredPerson.setBeneficiary(newBeneficiary);
     }
 
 
@@ -95,7 +133,6 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
         newOutboundProposal.setSubmittedDate(LocalDate.now());
         newOutboundProposal.setCreatedDate(LocalDate.now());
         newOutboundProposal.setUpdatedDate(LocalDate.now());
-//        newOutboundProposal.setInsuredPerson(insuredPerson);
         newOutboundProposal.setPolicyEndDate(newInsurance.getPolicyStartDate().plusDays(newInsurance.getCoveragePlan()));
         newOutboundProposal.setSubmittedDate(LocalDate.now());
         newOutboundProposal.setVersion(1);
@@ -140,101 +177,4 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
 
         return new int[]{fromAge, toAge};
     }
-
-
-
-
-
-
-
-
-
-
-//    @Transactional
-//    @Override
-//    public InsuredPerson registerInsurance(NewInsuranceRequest newInsuranceRequest) {
-//        Beneficiary newBeneficiaryPerson = Beneficiary.builder()
-//                .name(newInsuranceRequest.getBeneficiaryName())
-//                .dob(newInsuranceRequest.getBeneficiaryDob())
-//                .relationship(newInsuranceRequest.getBeneficiaryRelationship())
-//                .contactNumber(newInsuranceRequest.getBeneficiaryContactNumber())
-//                .nationalIdentificationNumber(newInsuranceRequest.getBeneficiaryNationalIdentificationNumber())
-//                .email(newInsuranceRequest.getBeneficiaryEmail())
-//                .address(newInsuranceRequest.getBeneficiaryAddress())
-//                .createdTime(LocalDateTime.now())
-//                .updatedTime(LocalDateTime.now())
-//                .isDeleted(false)
-//                .build();
-//
-//        if (newInsuranceRequest.isHasChild()) {
-//            Child newChild = Child.builder()
-//                    .name(newInsuranceRequest.getChildName())
-//                    .dob(newInsuranceRequest.getChildDob())
-//                    .gender(newInsuranceRequest.getChildGender())
-//                    .guardianceName(newInsuranceRequest.getChildGuardianceName())
-//                    .relationship(newInsuranceRequest.getChildRelationship())
-//                    .createdTime(LocalDateTime.now())
-//                    .updatedTime(LocalDateTime.now())
-//                    .isDeleted(false)
-//                    .build();
-//        }
-//
-//        InsuredPerson newInsuredPerson = new InsuredPerson();
-//        newInsuredPerson.setPassportNumber(newInsuranceRequest.getPassportNumber());
-//        newInsuredPerson.setPassportIssuedDate(newInsuranceRequest.getPassportIssuedDate());
-//        newInsuredPerson.setPassportIssuedCountry(newInsuranceRequest.getPassportIssuedCountry());
-//        newInsuredPerson.setName(newInsuranceRequest.getName());
-//        newInsuredPerson.setDob(newInsuranceRequest.getDob());
-//        newInsuredPerson.setGender(newInsuranceRequest.getGender());
-//        newInsuredPerson.setEstimatedDepartureDate(newInsuranceRequest.getEstimatedDepartureDate());
-//        newInsuredPerson.setJourneyFrom("MYANMAR");
-//        newInsuredPerson.setJourneyTo(newInsuranceRequest.getJourneyTo());
-//        newInsuredPerson.setPolicyStartDate(newInsuranceRequest.getPolicyStartDate());
-//        newInsuredPerson.setCoverageDuration(newInsuranceRequest.getCoverageDuration());
-//        newInsuredPerson.setInsurancePackage(newInsuranceRequest.getInsurancePackage());
-//        newInsuredPerson.setContactNumber(newInsuranceRequest.getContactNumber());
-//        newInsuredPerson.setForeignContactNumber(newInsuranceRequest.getForeignContactNumber());
-//        newInsuredPerson.setFatherName(newInsuranceRequest.getFatherName());
-//        newInsuredPerson.setRace(newInsuranceRequest.getRace());
-//        newInsuredPerson.setMaritalStatus(newInsuranceRequest.getMaritalStatus());
-//        newInsuredPerson.setEmail(newInsuranceRequest.getEmail());
-//        newInsuredPerson.setAddressInMyanmar(newInsuranceRequest.getAddressInMyanmar());
-//        newInsuredPerson.setAddressInForeign(newInsuranceRequest.getAddressInForeign());
-//        newInsuredPerson.setDestinationCountry(newInsuranceRequest.getDestinationCountry());
-//        newInsuredPerson.setBeneficiary(newBeneficiaryPerson);
-//
-//        if (newInsuranceRequest.isHasAgent()) {
-//            Optional<Agent> optionalAgent = agentRepo.findAgentByLicenseNumber(newInsuranceRequest.getAgentLicenseNumber());
-//            if (optionalAgent.isPresent()) {
-//                Agent agent = optionalAgent.get();
-//                newInsuredPerson.setAgent(agent);
-//            } else {
-//                throw new RuntimeException("Agent not found");
-//            }
-//        }
-//
-//        if (newInsuranceRequest.isHasChild()) {
-//            Child newChild = Child.builder()
-//                    .name(newInsuranceRequest.getChildName())
-//                    .dob(newInsuranceRequest.getChildDob())
-//                    .gender(newInsuranceRequest.getChildGender())
-//                    .guardianceName(newInsuranceRequest.getChildGuardianceName())
-//                    .relationship(newInsuranceRequest.getChildRelationship())
-//                    .createdTime(LocalDateTime.now())
-//                    .updatedTime(LocalDateTime.now())
-//                    .isDeleted(false)
-//                    .build();
-//            newInsuredPerson.setChild(newChild);
-//            childRepo.save(newChild);
-//        }
-//
-//        newInsuredPerson.setCreatedTime(LocalDateTime.now());
-//        newInsuredPerson.setUpdatedTime(LocalDateTime.now());
-//        newInsuredPerson.setDeleted(false);
-//
-//        beneficiaryRepo.save(newBeneficiaryPerson);
-//        return(insuredRepo.save(newInsuredPerson));
-//    }
-
-
 }

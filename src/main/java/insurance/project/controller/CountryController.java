@@ -23,24 +23,10 @@ import java.util.ArrayList;
 public class CountryController {
     private final CountryService countryService;
 
-//    @GetMapping("/all")
-//    public ResponseEntity<HttpResponse<ArrayList<Country>>> getAllCountries() {
-//        ArrayList<Country> countries = countryService.getAllCountries();
-//        HttpResponse<ArrayList<Country>> response = new HttpResponse<>(countries, "Successfully retrieved", HttpStatus.OK);
-//        return ResponseEntity.ok(response);
-//    }
-
     @GetMapping("/all")
     public ResponseEntity<HttpResponse<ArrayList<CountryResponse>>> getAllCountries() {
         ArrayList<CountryResponse> countries = countryService.getAllCountries();
         HttpResponse<ArrayList<CountryResponse>> response = new HttpResponse<>(countries, "Successfully retrieved", HttpStatus.OK);
         return ResponseEntity.ok(response);
     }
-
-//    @GetMapping("/all")
-//    public ResponseEntity<HttpResponse<Page<Country>>> getAllCountries(Pageable pageable) {
-//        Page<Country> countries = countryService.getAllCountries(pageable);
-//        HttpResponse<Page<Country>> response = new HttpResponse<>(countries, "Successfully retrieved", HttpStatus.OK);
-//        return ResponseEntity.ok(response);
-//    }
 }

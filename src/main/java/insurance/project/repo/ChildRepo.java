@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface ChildRepo extends JpaRepository<Child, UUID> {
     Optional<Child> findByChildName(String childName);
+    Child findByInsuredPersonId(UUID insuredPersonId);
 }

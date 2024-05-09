@@ -28,7 +28,7 @@ public class Child {
     private LocalDate updatedDate;
     private int version;;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "insured_person_id")
     private InsuredPerson insuredPerson;;
 }

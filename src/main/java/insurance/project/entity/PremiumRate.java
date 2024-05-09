@@ -27,7 +27,7 @@ public class PremiumRate {
     private LocalDate updatedDate;
     private int version;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "currency_id")
     private Currency currency;
 }

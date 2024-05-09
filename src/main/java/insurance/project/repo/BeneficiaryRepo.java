@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface BeneficiaryRepo extends JpaRepository<Beneficiary, UUID> {
     Optional<Beneficiary> findByBeneficiaryNRC(String beneficiaryNRC);
+    Beneficiary findByInsuredPersonId(UUID insuredPersonId);
 }

@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface OutboundProposalRepo extends JpaRepository<OutboundProposal, UUID> {
     Optional<OutboundProposal> findById(UUID id);
+
 }

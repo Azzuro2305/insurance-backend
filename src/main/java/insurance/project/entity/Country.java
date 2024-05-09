@@ -24,9 +24,9 @@ public class Country {
     private LocalDate updatedDate;
     private int version;
 
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
-    private List<InsuredPerson> insuredPersons;
+//    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
+//    private List<InsuredPerson> insuredPersons;
 
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
-    private List<Beneficiary> beneficiaries;
+//    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
+//    private List<Beneficiary> beneficiaries;
 }

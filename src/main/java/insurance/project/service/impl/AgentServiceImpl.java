@@ -39,36 +39,3 @@ public class AgentServiceImpl implements AgentService {
         return agentValidationResult;
     }
 }
-
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
-//@Service
-//@AllArgsConstructor
-//public class AgentServiceImpl implements AgentService {
-//    private final AgentRepo agentRepo;
-//    private final ModelMapper modelMapper;
-//
-//    private static final Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
-//
-//    @Override
-//    public AgentValidation validateAgent(AgentValidation agentValidation) {
-//        AgentValidation agentValidationResult = new AgentValidation();
-//        String agentType = agentValidation.getAgentType();
-//
-//        if (agentType.equals("normalagent")) {
-//            // existing code
-//        }
-//        else if (agentType.equals("associationAgent")) {
-//            Agent agent = agentRepo.findAgentByAgentLicenseAndAgentPassword(agentValidation.getAgentLicense(), agentValidation.getAgentPassword());
-//            if (agent != null) {
-//                modelMapper.map(agent, agentValidationResult);
-//                agentValidationResult.setValid(true);
-//            } else {
-//                logger.error("No agent found with license {} and password {}", agentValidation.getAgentLicense(), agentValidation.getAgentPassword());
-//                agentValidationResult.setValid(false);
-//            }
-//        }
-//        return agentValidationResult;
-//    }
-//}

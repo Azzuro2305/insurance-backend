@@ -16,5 +16,4 @@ public class ProjectApplication {
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
-
 }

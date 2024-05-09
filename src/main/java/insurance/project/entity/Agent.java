@@ -28,7 +28,7 @@ public class Agent {
     private LocalDate updatedDate;
     private int version;
 
-    @OneToMany(mappedBy = "agent", cascade = CascadeType.ALL)
-    private List<OutboundProposal> outboundProposals;
+//    @OneToMany(mappedBy = "agent", cascade = CascadeType.ALL)
+//    private List<OutboundProposal> outboundProposals;
 
 }
