@@ -23,6 +23,7 @@ public class OutboundProposal {
     private String journeyFrom;  // default value will be given from frontend side (MYANMAR)
     private String journeyTo;
     private String destinationCountry;
+    private String currency; // testing
     private double rate;
     private int coveragePlan;
     private String packages;

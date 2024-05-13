@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface PremiumRateRepo extends JpaRepository<PremiumRate, UUID> {
     @Query("SELECT p FROM PremiumRate p WHERE p.packages = :packages AND p.coveragePlan = :coveragePlan AND p.fromAge >= :fromAge AND p.toAge <= :toAge")
-    Optional<PremiumRate> findPremiumRateByPackageAndCoveragePlanAndAgeRange(@Param("packages") String packages, @Param("coveragePlan") int coveragePlan, @Param("fromAge") int fromAge, @Param("toAge") int toAge);
+    PremiumRate findPremiumRateByPackageAndCoveragePlanAndAgeRange(@Param("packages") String packages, @Param("coveragePlan") int coveragePlan, @Param("fromAge") int fromAge, @Param("toAge") int toAge);
 
     Double findRateById(UUID Id);
 }

@@ -36,6 +36,7 @@ public class NewInsurance {
     private LocalDate policyStartDate;
     private int coveragePlan;
     private String packages;
+    private String currency;
 //    private LocalDate policyEndDate;  // calculate from policyStartDate in backend
 
 

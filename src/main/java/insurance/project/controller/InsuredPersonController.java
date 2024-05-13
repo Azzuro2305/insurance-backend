@@ -1,8 +1,10 @@
 package insurance.project.controller;
 
+import insurance.project.dto.CalculatePremium.CalculatePremium;
 import insurance.project.dto.InsuredData.InsuredData;
 import insurance.project.dto.NewInsurance.NewInsurance;
 import insurance.project.dto.utility.HttpResponse;
+import insurance.project.entity.PremiumRate;
 import insurance.project.service.InsuredPersonService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,13 @@ public class InsuredPersonController {
     public ResponseEntity<HttpResponse<List<InsuredData>>> getInsuredData(@RequestParam String passportNumber, @RequestParam UUID passportIssuedCountry) {
         List<InsuredData> insuredData = insuredService.getInsuredData(passportNumber, passportIssuedCountry);
         HttpResponse<List<InsuredData>> response = new HttpResponse<>(insuredData, "Successfully retrieved", HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/calculate-premium")
+    public ResponseEntity<HttpResponse<PremiumRate>> calculatePremiumRate(@RequestBody NewInsurance newInsurance) {
+        PremiumRate premiumRate = insuredService.calculatePremiumRate(newInsurance);
+        HttpResponse<PremiumRate> response = new HttpResponse<>(premiumRate, "Successfully calculated", HttpStatus.OK);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

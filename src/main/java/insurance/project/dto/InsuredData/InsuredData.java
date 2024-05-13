@@ -25,8 +25,8 @@ public class InsuredData {
     private String destinationCountry;
     private int deductibleClaim;  // manual based on package
     private LocalDate paymentDate; // manual
-    private String currency;
     private UUID proposalID;
+    private String packages;
 
     // Agency Information
     private String agentName;

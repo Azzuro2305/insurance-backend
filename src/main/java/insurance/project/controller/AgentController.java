@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AgentController {
     private final AgentService agentService;
 
-    @GetMapping("/validate")
+    @PostMapping("/validate")
     public ResponseEntity<HttpResponse<AgentValidation>> validateAgent(@RequestBody AgentValidation agentValidation) {
         AgentValidation agent = agentService.validateAgent(agentValidation);
         if (agent.isValid()) {

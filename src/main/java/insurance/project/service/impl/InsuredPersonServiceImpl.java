@@ -1,5 +1,6 @@
 package insurance.project.service.impl;
 
+import insurance.project.dto.CalculatePremium.CalculatePremium;
 import insurance.project.dto.InsuredData.InsuredData;
 import insurance.project.dto.NewInsurance.NewInsurance;
 import insurance.project.entity.*;
@@ -30,6 +31,7 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
     private final AgentRepo agentRepo;
     private final PremiumRateRepo premiumRateRepo;
     private final CountryRepo countryRepo;
+    private final CurrencyRepo currencyRepo;
 
     private final ModelMapper modelMapper;
 
@@ -50,6 +52,11 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
                 insuredData.setPassportIssuedCountry(insuredPerson.getCountry().getCountryName());
 
                 OutboundProposal outboundProposal = insuredPerson.getOutboundProposal();
+                if (outboundProposal.getCurrency().equals("USD")) {
+                    insuredData.setRate(outboundProposal.getRate());
+                } else {
+                    insuredData.setRate(outboundProposal.getRate() * 3000);
+                }
                 insuredData.setPaymentDate(outboundProposal.getCreatedDate());
                 modelMapper.map(outboundProposal, insuredData);
 
@@ -80,6 +87,14 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
 
         }
         return null;
+    }
+
+    @Override
+    public PremiumRate calculatePremiumRate(NewInsurance newInsurance) {
+        int insuredPersonAge = LocalDate.now().getYear() - newInsurance.getInsuredDOB().getYear();
+        int[] ageRange = getAgeRange(insuredPersonAge);
+        return premiumRateRepo.findPremiumRateByPackageAndCoveragePlanAndAgeRange(newInsurance.getPackages(), newInsurance.getCoveragePlan(), ageRange[0], ageRange[1]);
+//                .orElseThrow(() -> new RuntimeException("Premium rate not found"));
     }
 
 
@@ -139,8 +154,8 @@ public class InsuredPersonServiceImpl implements InsuredPersonService {
 
         int insuredPersonAge = LocalDate.now().getYear() - insuredPerson.getInsuredDOB().getYear();
         int[] ageRange = getAgeRange(insuredPersonAge);
-        newOutboundProposal.setPremiumRate(premiumRateRepo.findPremiumRateByPackageAndCoveragePlanAndAgeRange(newInsurance.getPackages(), newInsurance.getCoveragePlan(), ageRange[0], ageRange[1])
-                .orElseThrow(() -> new RuntimeException("Premium rate not found")));
+        newOutboundProposal.setPremiumRate(premiumRateRepo.findPremiumRateByPackageAndCoveragePlanAndAgeRange(newInsurance.getPackages(), newInsurance.getCoveragePlan(), ageRange[0], ageRange[1]));
+//                .orElseThrow(() -> new RuntimeException("Premium rate not found")));
         newOutboundProposal.setRate(newOutboundProposal.getPremiumRate().getRate());
 
         if (newInsurance.isHasAgent()) {
